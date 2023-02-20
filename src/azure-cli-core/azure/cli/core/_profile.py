@@ -158,6 +158,8 @@ class Profile:
             else:
                 identity.login_with_service_principal(username, password, scopes=scopes)
 
+        import timeit
+        start_time = timeit.default_timer()
         # We have finished login. Let's find all subscriptions.
         if user_identity:
             username = user_identity['username']
@@ -173,10 +175,17 @@ class Profile:
         if tenant:
             subscriptions = subscription_finder.find_using_specific_tenant(tenant, credential)
         else:
+            # import cProfile
+            # p = cProfile.Profile()
+            # p.runcall(subscription_finder.find_using_common_tenant, username, credential)
+            # p.print_stats()
             subscriptions = subscription_finder.find_using_common_tenant(username, credential)
 
         if not subscriptions and not allow_no_subscriptions:
             raise CLIError("No subscriptions found for {}.".format(username))
+
+        time_2 = timeit.default_timer()
+        print("Finding subscriptions based on given tenant in seconds: " + str(time_2 - start_time))
 
         if allow_no_subscriptions:
             t_list = [s.tenant_id for s in subscriptions]
@@ -190,6 +199,8 @@ class Profile:
                                                   is_service_principal, bool(use_cert_sn_issuer))
 
         self._set_subscriptions(consolidated)
+        # end_time = timeit.default_timer()
+        # print("_set_subscriptions in seconds: " + str(end_time - time_2))
         return deepcopy(consolidated)
 
     def login_with_managed_identity(self, identity_id=None, allow_no_subscriptions=None):
@@ -803,6 +814,8 @@ class SubscriptionFinder:
         return all_subscriptions
 
     def find_using_specific_tenant(self, tenant, credential):
+        # import timeit
+        # time_1 = timeit.default_timer()
         client = self._create_subscription_client(credential)
         subscriptions = client.subscriptions.list()
         all_subscriptions = []
@@ -810,6 +823,8 @@ class SubscriptionFinder:
             _attach_token_tenant(s, tenant)
             all_subscriptions.append(s)
         self.tenants.append(tenant)
+        # time_2 = timeit.default_timer()
+        # print("find_using_specific_tenant in seconds: " + str(time_2 - time_1))
         return all_subscriptions
 
     def _create_subscription_client(self, credential):

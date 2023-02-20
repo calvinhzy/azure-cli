@@ -695,6 +695,8 @@ class AzCliCommandInvoker(CommandInvoker):
         params = self._filter_params(expanded_arg)
         try:
             result = cmd_copy(params)
+            # import timeit
+            # start_time = timeit.default_timer()
             if cmd_copy.supports_no_wait and getattr(expanded_arg, 'no_wait', False):
                 result = None
             elif cmd_copy.no_wait_param and getattr(expanded_arg, cmd_copy.no_wait_param, False):
@@ -712,6 +714,8 @@ class AzCliCommandInvoker(CommandInvoker):
             result = todict(result, AzCliCommandInvoker.remove_additional_prop_layer)
             event_data = {'result': result}
             cmd_copy.cli_ctx.raise_event(EVENT_INVOKER_TRANSFORM_RESULT, event_data=event_data)
+            # end_time = timeit.default_timer()
+            # print("run_job in seconds: " + str(end_time - start_time))
             return event_data['result']
         except Exception as ex:  # pylint: disable=broad-except
             if cmd_copy.exception_handler:

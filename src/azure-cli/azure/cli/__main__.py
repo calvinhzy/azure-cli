@@ -7,6 +7,7 @@
 import timeit
 # Log the start time
 start_time = timeit.default_timer()
+# print("start_time:"+str(start_time))
 
 import sys
 import uuid
@@ -24,11 +25,11 @@ __version__ = "2.45.0"
 
 # run azd
 if sys.argv and len(sys.argv) > 1 and sys.argv[1] == 'dev':
-    print_styled_text((Style.SUCCESS, "Running Azure Developer CLI (azd) through Azure CLI. "))
+    # print_styled_text((Style.SUCCESS, "Running Azure Developer CLI (azd) through Azure CLI. "))
     azd_cli(sys.argv[2:])
     for arg in sys.argv:
         if arg == '-h' or arg == '--help' or len(sys.argv) == 2:
-            print_styled_text((Style.SUCCESS, "You can replace `azd` with `az dev` in the above commands."))
+            # print_styled_text((Style.SUCCESS, "You can replace `azd` with `az dev` in the above commands."))
             break
     sys.exit()
 
@@ -58,6 +59,9 @@ try:
     telemetry.start()
 
     exit_code = cli_main(az_cli, sys.argv[1:])
+    end_time = timeit.default_timer()
+    # print("end_time:"+str(end_time))
+    # print("Total time in seconds: "+str(end_time-start_time))
 
     if exit_code == 0:
         telemetry.set_success()
