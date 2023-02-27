@@ -58,6 +58,9 @@ def get_access_token(cmd, subscription=None, resource=None, scopes=None, resourc
     get AAD token to access to a specified resource.
     Use 'az cloud show' command for other Azure resources
     """
+    import timeit
+    start = timeit.default_timer()
+
     if resource is None and resource_type:
         endpoints_attr_name = cloud_resource_type_mappings[resource_type]
         resource = getattr(cmd.cli_ctx.cloud.endpoints, endpoints_attr_name)
@@ -75,6 +78,9 @@ def get_access_token(cmd, subscription=None, resource=None, scopes=None, resourc
     }
     if subscription:
         result['subscription'] = subscription
+
+    end = timeit.default_timer()
+    print(f"get_access_token time in seconds: {end - start}")
 
     return result
 

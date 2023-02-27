@@ -57,11 +57,12 @@ init_finish_time = timeit.default_timer()
 
 try:
     telemetry.start()
-
+    setup_time = timeit.default_timer()
+    print("CLI setup such as telemetry and logger in seconds: " + str(setup_time - start_time))
     exit_code = cli_main(az_cli, sys.argv[1:])
     end_time = timeit.default_timer()
     # print("end_time:"+str(end_time))
-    # print("Total time in seconds: "+str(end_time-start_time))
+    print("Total time in seconds: "+str(end_time-start_time))
 
     if exit_code == 0:
         telemetry.set_success()

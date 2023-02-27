@@ -503,6 +503,8 @@ class AzCliCommandInvoker(CommandInvoker):
 
     # pylint: disable=too-many-statements,too-many-locals,too-many-branches
     def execute(self, args):
+        import timeit
+        start = timeit.default_timer()
         from knack.events import (EVENT_INVOKER_PRE_CMD_TBL_CREATE, EVENT_INVOKER_POST_CMD_TBL_CREATE,
                                   EVENT_INVOKER_CMD_TBL_LOADED, EVENT_INVOKER_PRE_PARSE_ARGS,
                                   EVENT_INVOKER_POST_PARSE_ARGS,
@@ -513,6 +515,7 @@ class AzCliCommandInvoker(CommandInvoker):
         # TODO: Can't simply be invoked as an event because args are transformed
         args = _pre_command_table_create(self.cli_ctx, args)
 
+
         self.cli_ctx.raise_event(EVENT_INVOKER_PRE_CMD_TBL_CREATE, args=args)
         self.commands_loader.load_command_table(args)
         self.cli_ctx.raise_event(EVENT_INVOKER_PRE_CMD_TBL_TRUNCATE,
@@ -520,6 +523,9 @@ class AzCliCommandInvoker(CommandInvoker):
         command = self._rudimentary_get_command(args)
         self.cli_ctx.invocation.data['command_string'] = command
         telemetry.set_raw_command_name(command)
+
+
+
 
         try:
             self.commands_loader.command_table = {command: self.commands_loader.command_table[command]}
@@ -612,7 +618,6 @@ class AzCliCommandInvoker(CommandInvoker):
 
         # TODO: This fundamentally alters the way Knack.invocation works here. Cannot be customized
         # with an event. Would need to be customized via inheritance.
-
         cmd = parsed_args.func
         self.cli_ctx.data['command'] = parsed_args.command
 
@@ -650,6 +655,9 @@ class AzCliCommandInvoker(CommandInvoker):
 
             self._validation(expanded_arg)
             jobs.append((expanded_arg, cmd_copy))
+
+        last = timeit.default_timer()
+        print(f"Execution setup such as load_command_table in seconds: {last - start}")
 
         ids = getattr(parsed_args, '_ids', None) or [None] * len(jobs)
         if self.cli_ctx.config.getboolean('core', 'disable_concurrent_ids', False) or len(ids) < 2:
@@ -694,9 +702,9 @@ class AzCliCommandInvoker(CommandInvoker):
     def _run_job(self, expanded_arg, cmd_copy):
         params = self._filter_params(expanded_arg)
         try:
-            result = cmd_copy(params)
             # import timeit
             # start_time = timeit.default_timer()
+            result = cmd_copy(params)
             if cmd_copy.supports_no_wait and getattr(expanded_arg, 'no_wait', False):
                 result = None
             elif cmd_copy.no_wait_param and getattr(expanded_arg, cmd_copy.no_wait_param, False):

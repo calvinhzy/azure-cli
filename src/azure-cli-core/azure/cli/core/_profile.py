@@ -552,7 +552,11 @@ class Profile:
         return active_account[_USER_ENTITY][_USER_NAME]
 
     def get_subscription(self, subscription=None):  # take id or name
+        # import timeit
+        # start = timeit.default_timer()
         subscriptions = self.load_cached_subscriptions()
+        # end = timeit.default_timer()
+        # # print(f"load_cached_subscriptions takes {end-start} seconds")
         if not subscriptions:
             raise CLIError(_AZ_LOGIN_MESSAGE)
 
