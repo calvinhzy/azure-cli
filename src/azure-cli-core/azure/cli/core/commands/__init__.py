@@ -657,7 +657,7 @@ class AzCliCommandInvoker(CommandInvoker):
             jobs.append((expanded_arg, cmd_copy))
 
         last = timeit.default_timer()
-        print(f"Execution setup such as load_command_table in seconds: {last - start}")
+        print(f"Execution setup such as load_command_table takes: {last - start:.6f}s")
 
         ids = getattr(parsed_args, '_ids', None) or [None] * len(jobs)
         if self.cli_ctx.config.getboolean('core', 'disable_concurrent_ids', False) or len(ids) < 2:

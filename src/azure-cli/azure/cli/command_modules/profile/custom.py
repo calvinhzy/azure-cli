@@ -80,7 +80,7 @@ def get_access_token(cmd, subscription=None, resource=None, scopes=None, resourc
         result['subscription'] = subscription
 
     end = timeit.default_timer()
-    print(f"get_access_token time in seconds: {end - start}")
+    print(f"Total get_access_token time: {end - start:.6f}s")
 
     return result
 

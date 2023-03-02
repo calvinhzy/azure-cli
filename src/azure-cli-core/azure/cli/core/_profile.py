@@ -393,9 +393,11 @@ class Profile:
             import timeit
             start = timeit.default_timer()
             credential = self._create_credential(account, tenant)
-            end = timeit.default_timer()
-            print(f'_create_credential: {end - start}s')
+            mid = timeit.default_timer()
+            print(f'(get_access_token) Creating a credential takes: {mid - start:0.6f}s')
             sdk_token = credential.get_token(*scopes)
+            end = timeit.default_timer()
+            print(f'(get_access_token) Getting token either from cache or calling service: {end - mid:0.6f}s')
 
         # Convert epoch int 'expires_on' to datetime string 'expiresOn' for backward compatibility
         # WARNING: expiresOn is deprecated and will be removed in future release.
@@ -556,8 +558,8 @@ class Profile:
         return active_account[_USER_ENTITY][_USER_NAME]
 
     def get_subscription(self, subscription=None):  # take id or name
-        import timeit
-        start = timeit.default_timer()
+        # import timeit
+        # start = timeit.default_timer()
         subscriptions = self.load_cached_subscriptions()
         if not subscriptions:
             raise CLIError(_AZ_LOGIN_MESSAGE)
@@ -574,8 +576,8 @@ class Profile:
         if len(result) > 1:
             raise CLIError("Multiple subscriptions with the name '{}' found. "
                            "Specify the subscription ID.".format(subscription))
-        end = timeit.default_timer()
-        print(f"get_subscription takes {end - start} seconds")
+        # end = timeit.default_timer()
+        # print(f"get_subscription takes {end - start} seconds")
         return result[0]
 
     def get_subscription_id(self, subscription=None):  # take id or name
@@ -601,20 +603,20 @@ class Profile:
         :param client_id:
         :return:
         """
-        import timeit
-        start = timeit.default_timer()
+        # import timeit
+        # start = timeit.default_timer()
         user_type = account[_USER_ENTITY][_USER_TYPE]
         username_or_sp_id = account[_USER_ENTITY][_USER_NAME]
         tenant_id = tenant_id if tenant_id else account[_TENANT_ID]
         identity = _create_identity_instance(self.cli_ctx, self._authority, tenant_id=tenant_id, client_id=client_id)
-        end = timeit.default_timer()
-        print(f'_create_identity_instance {end-start}')
+        # mid = timeit.default_timer()
+        # print(f'(get_access_token) Creating an Identity instance takes: {mid-start:.6f}s')
 
         # User
         if user_type == _USER:
             ret = identity.get_user_credential(username_or_sp_id)
-            end2 = timeit.default_timer()
-            print(f'get_user_credential {end2 - end}')
+            # end = timeit.default_timer()
+            # print(f'(get_access_token) Getting user credential takes: {end - mid:.6f}s')
             return ret
 
         # Service Principal
