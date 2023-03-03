@@ -396,8 +396,8 @@ class Profile:
             mid = timeit.default_timer()
             print(f'(get_access_token) Creating a credential takes: {mid - start:0.6f}s')
             sdk_token = credential.get_token(*scopes)
-            end = timeit.default_timer()
-            print(f'(get_access_token) Getting token either from cache or calling service: {end - mid:0.6f}s')
+            # end = timeit.default_timer()
+            # print(f'(get_access_token) Getting token either from cache or calling service: {end - mid:0.6f}s')
 
         # Convert epoch int 'expires_on' to datetime string 'expiresOn' for backward compatibility
         # WARNING: expiresOn is deprecated and will be removed in future release.
