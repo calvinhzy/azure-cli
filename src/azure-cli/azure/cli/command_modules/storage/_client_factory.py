@@ -420,3 +420,7 @@ def cf_share_file_client(cli_ctx, kwargs):
 
 def cf_local_users(cli_ctx, _):
     return storage_client_factory(cli_ctx).local_users
+
+
+def cf_sku(cli_ctx, _):
+    return storage_client_factory(cli_ctx).skus

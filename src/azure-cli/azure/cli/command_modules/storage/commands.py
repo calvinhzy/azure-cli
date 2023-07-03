@@ -18,7 +18,7 @@ from azure.cli.command_modules.storage._client_factory import (cf_sa, cf_blob_co
                                                                cf_sa_blob_inventory, cf_blob_service, cf_queue_client,
                                                                cf_share_client, cf_share_service,
                                                                cf_share_file_client, cf_share_directory_client,
-                                                               cf_container_lease_client, cf_local_users)
+                                                               cf_container_lease_client, cf_local_users, cf_sku)
 
 from azure.cli.core.commands import CliCommandType
 from azure.cli.core.commands.arm import show_exception_handler
@@ -82,6 +82,12 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
         client_factory=blob_data_service_factory,
         resource_type=ResourceType.DATA_STORAGE)
 
+    storage_sku_sdk = CliCommandType(
+        operations_tmpl='azure.mgmt.storage.operations#SkusOperations.{}',
+        client_factory=cf_sku,
+        resource_type=ResourceType.MGMT_STORAGE
+    )
+
     def get_custom_sdk(custom_module, client_factory, resource_type=ResourceType.DATA_STORAGE):
         """Returns a CliCommandType instance with specified operation template based on the given custom module name.
         This is useful when the command is not defined in the default 'custom' module but instead in a module under
@@ -121,6 +127,9 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
                   supports_no_wait=True, min_api='2021-06-01')
         g.command('hns-migration stop', 'begin_abort_hierarchical_namespace_migration',
                   supports_no_wait=True, min_api='2021-06-01')
+
+    with self.command_group('storage account', storage_sku_sdk, resource_type=ResourceType.MGMT_STORAGE) as g:
+        g.command('list-sku', 'list')
 
     with self.command_group('storage account', storage_account_sdk_keys, resource_type=ResourceType.MGMT_STORAGE,
                             custom_command_type=storage_account_custom_type) as g:
