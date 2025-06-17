@@ -81,9 +81,12 @@ azure-mgmt-synapse==2.1.0b5
 azure-mgmt-trafficmanager==1.0.0
 azure-mgmt-web==7.3.1
 azure-monitor-query==1.2.0
-azure-multiapi-storage==1.4.0
 azure-nspkg==3.0.2
 azure-storage-common==1.4.2
+azure-storage-blob==12.16.0
+azure-storage-file-datalake==12.19.0b1
+azure-storage-file-share==12.21.0
+azure-storage-queue==12.3.0
 azure-synapse-accesscontrol==0.5.0
 azure-synapse-artifacts==0.20.0
 azure-synapse-managedprivateendpoints==0.4.0

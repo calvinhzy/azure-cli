@@ -128,7 +128,6 @@ class StorageBlobUploadLiveTests(LiveScenarioTest):
             JMESPathCheck('name', blob_name)])
 
 
-@api_version_constraint(ResourceType.DATA_STORAGE_BLOB, min_api='2019-12-12')
 class StorageBlobQueryTests(StorageScenarioMixin, LiveScenarioTest):
     @ResourceGroupPreparer()
     @StorageAccountPreparer(kind='StorageV2')

@@ -608,7 +608,7 @@ def upload_blob(cmd, client, file_path=None, container_name=None, blob_name=None
     if maxsize_condition:
         upload_args['maxsize_condition'] = maxsize_condition
 
-    if cmd.supported_api_version(min_api='2016-05-31'):
+    if validate_content:
         upload_args['validate_content'] = validate_content
 
     if progress_callback:
