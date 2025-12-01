@@ -55,7 +55,7 @@ except SystemExit as ex:  # some code directly call sys.exit, this is to make su
 finally:
     # Log the invoke finish time
     invoke_finish_time = timeit.default_timer()
-    logger.info("Command ran in %.3f seconds (init: %.3f, invoke: %.3f)",
+    logger.warning("Command ran in %.3f seconds (init: %.3f, invoke: %.3f)",
                 invoke_finish_time - start_time,
                 init_finish_time - start_time,
                 invoke_finish_time - init_finish_time)

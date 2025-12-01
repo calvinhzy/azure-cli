@@ -23,8 +23,12 @@ from azure.cli.core.commands import CliCommandType
 from azure.cli.core.commands.arm import show_exception_handler
 from azure.cli.core.profiles import ResourceType
 
+import time
+from knack.log import get_logger
+logger = get_logger(__name__)
 
 def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-statements
+    start = time.time()
     storage_account_sdk = CliCommandType(
         operations_tmpl='azure.mgmt.storage.operations#StorageAccountsOperations.{}',
         client_factory=cf_sa,
@@ -100,6 +104,7 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
         g.custom_command('create', 'create_storage_account')
         g.command('delete', 'delete', confirmation=True)
         g.show_command('show', 'get_properties')
+
         g.custom_command('list', 'list_storage_accounts')
         g.custom_command(
             'show-usage', 'show_storage_account_usage')
@@ -943,5 +948,9 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
         self.command_table['storage account migration start'] = AccountMigrationStart(loader=self)
 
     with self.command_group('storage account'):
-        from .operations.account import FileServiceUsage
+        from .operations.account import FileServiceUsage, Show
         self.command_table['storage account file-service-usage'] = FileServiceUsage(loader=self)
+        # self.command_table['storage account show'] = Show(loader=self)
+
+    end = time.time()
+    # logger.warning(f"load cmd {end-start}s")

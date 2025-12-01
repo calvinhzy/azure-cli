@@ -46,7 +46,11 @@ def _query_account_key(cli_ctx, account_name):
 def _query_account_rg(cli_ctx, account_name):
     """Query the storage account's resource group, which the mgmt sdk requires."""
     scf = storage_client_factory(cli_ctx)
+    import time
+    start = time.time()
     acc = next((x for x in scf.storage_accounts.list() if x.name == account_name), None)
+    end = time.time()
+    print(f'LIST storage account service call to get resource group took {end - start} seconds')
     if acc:
         from azure.mgmt.core.tools import parse_resource_id
         return parse_resource_id(acc.id)['resource_group'], scf

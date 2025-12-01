@@ -14,6 +14,8 @@ from azure.cli.core.util import get_file_json, shell_safe_json_parse, find_child
 from azure.cli.core.profiles import ResourceType, get_sdk
 from ..aaz.latest.storage.account.migration._start import Start as _AccountMigrationStart
 from ..aaz.latest.storage.account import FileServiceUsage as _FileServiceUsage
+from ..aaz.latest.storage.account import Show as _Show
+from ..aaz.latest.storage.account import List as _List
 from knack.log import get_logger
 from knack.util import CLIError
 
@@ -1329,3 +1331,23 @@ class FileServiceUsage(_FileServiceUsage):
         parse_account_name_aaz(self, args)
         args.file_services_name = 'default'
         args.file_service_usages_name = 'default'
+
+
+class Show(_Show):
+    @classmethod
+    def _build_arguments_schema(cls, *args, **kwargs):
+        args_schema = super()._build_arguments_schema(*args, **kwargs)
+        # _format_storage_account_id(args_schema)
+        args_schema.resource_group._required = False
+        return args_schema
+
+    def pre_operations(self):
+        args = self.ctx.args
+        if not args.resource_group:
+            storage_account_list = _List(loader=self)({})
+            for x in storage_account_list:
+                if x["name"] == self.ctx.args.account_name:
+                    from azure.mgmt.core.tools import parse_resource_id
+                    self.ctx.args.resource_group = parse_resource_id(x["id"])["resource_group"]
+                    return
+            raise ValueError("Storage account '{}' not found.".format(account_name))
