@@ -72,15 +72,24 @@ def dir_path_completer(cmd, prefix, namespace):
     return sorted(names)
 
 
-def get_storage_name_completion_list(service, func, parent=None):
+def get_storage_name_completion_list(service, func, parent=None, file=False):
     @Completer
     def completer(cmd, _, namespace):
         validate_client_parameters(cmd, namespace)
         client = get_storage_client(cmd.cli_ctx, service, namespace)
         if parent:
             parent_name = getattr(namespace, parent)
-            method = getattr(client, func)
-            items = [x.name for x in method(**{parent: parent_name})]
+            items = []
+            if parent == 'container_name':
+                container_client = service.get_container_client(container=parent_name)
+                items = [x.name for x in getattr(container_client, func)()]
+            elif parent == 'share_name':
+                share_client = service.get_share_client(share=parent_name)
+                if file:
+                    directory_name = getattr(namespace, 'directory_name')
+                    items = [x.name for x in getattr(share_client, func)(directory_name=directory_name) if not x.is_directory]
+                else:
+                    items = [x.name for x in getattr(share_client, func)() if x.is_directory]
         else:
             items = [x.name for x in getattr(client, func)()]
         return items
@@ -94,6 +103,7 @@ def get_storage_acl_name_completion_list(service, container_param, func):
         validate_client_parameters(cmd, namespace)
         client = get_storage_client(cmd.cli_ctx, service, namespace)
         container_name = getattr(namespace, container_param)
-        return list(getattr(client, func)(container_name))
+        container_client = client.get_container_client(container=container_name)
+        return list(getattr(container_client, func)())
 
     return completer

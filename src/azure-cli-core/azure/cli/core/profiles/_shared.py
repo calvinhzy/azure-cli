@@ -460,6 +460,8 @@ def _get_attr(sdk_path, mod_attr_path, checked=True):
     except (ImportError, AttributeError) as ex:
         import traceback
         logger.debug(traceback.format_exc())
+        logger.debug(sdk_path)
+        logger.debug(mod_attr_path)
         if checked:
             return None
         raise ex

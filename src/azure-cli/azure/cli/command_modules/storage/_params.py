@@ -36,8 +36,8 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
 
     from .completers import get_storage_name_completion_list
 
-    t_base_blob_service = self.get_sdk('blob.baseblobservice#BaseBlobService')
-    t_file_service = self.get_sdk('file#FileService')
+    t_blob_service = self.get_sdk('_blob_service_client#BlobServiceClient',
+                                      resource_type=ResourceType.DATA_STORAGE_BLOB)
     t_share_service = self.get_sdk('_share_service_client#ShareServiceClient',
                                    resource_type=ResourceType.DATA_STORAGE_FILESHARE)
     t_queue_service = self.get_sdk('_queue_service_client#QueueServiceClient',
@@ -55,20 +55,21 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
                                      local_context_attribute=LocalContextAttribute(
                                          name='storage_account_name', actions=[LocalContextAction.GET]))
     blob_name_type = CLIArgumentType(options_list=['--blob-name', '-b'], help='The blob name.',
-                                     completer=get_storage_name_completion_list(t_base_blob_service, 'list_blobs',
+                                     completer=get_storage_name_completion_list(t_blob_service, 'list_blobs',
                                                                                 parent='container_name'))
 
     container_name_type = CLIArgumentType(options_list=['--container-name', '-c'], help='The container name.',
-                                          completer=get_storage_name_completion_list(t_base_blob_service,
+                                          completer=get_storage_name_completion_list(t_blob_service,
                                                                                      'list_containers'))
     directory_type = CLIArgumentType(options_list=['--directory-name', '-d'], help='The directory name.',
-                                     completer=get_storage_name_completion_list(t_file_service,
+                                     completer=get_storage_name_completion_list(t_share_service,
                                                                                 'list_directories_and_files',
                                                                                 parent='share_name'))
     file_name_type = CLIArgumentType(options_list=['--file-name', '-f'],
-                                     completer=get_storage_name_completion_list(t_file_service,
+                                     completer=get_storage_name_completion_list(t_share_service,
                                                                                 'list_directories_and_files',
-                                                                                parent='share_name'))
+                                                                                parent='share_name',
+                                                                                file=True))
     share_name_type = CLIArgumentType(options_list=['--share-name', '-s'], help='The file share name.',
                                       completer=get_storage_name_completion_list(t_share_service, 'list_shares'))
     table_name_type = CLIArgumentType(options_list=['--table-name', '-t'], help='The table name.',
@@ -952,8 +953,8 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
                         "The expiry parameter and '--auth-mode login' are required if this argument is specified. ")
         c.argument('id', options_list='--policy-name', validator=validate_policy,
                    help='The name of a stored access policy within the container\'s ACL.',
-                   completer=get_storage_acl_name_completion_list(t_base_blob_service, 'container_name',
-                                                                  'get_access_policy'))
+                   completer=get_storage_acl_name_completion_list(t_blob_service, 'container_name',
+                                                                  'get_container_access_policy'))
         c.argument('permission', options_list='--permissions',
                    help=sas_help.format(get_permission_help_string(t_blob_permissions)),
                    validator=get_permission_validator(t_blob_permissions))
@@ -1632,8 +1633,8 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
                                                resource_type=ResourceType.DATA_STORAGE_BLOB)
         c.argument('container_name', container_name_type)
         c.argument('policy_name', options_list=('--name', '-n'), help='The stored access policy name.',
-                   completer=get_storage_acl_name_completion_list(t_base_blob_service, 'container_name',
-                                                                  'get_access_policy'))
+                   completer=get_storage_acl_name_completion_list(t_blob_service, 'container_name',
+                                                                  'get_container_access_policy'))
         help_str = 'Allowed values: {}. Can be combined'.format(get_permission_help_string(t_container_permissions))
         c.argument('permission', options_list='--permissions', help=help_str,
                    validator=get_permission_validator(t_container_permissions))
@@ -1659,8 +1660,8 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
         c.register_sas_arguments()
         c.argument('id', options_list='--policy-name', validator=validate_policy,
                    help='The name of a stored access policy within the container\'s ACL.',
-                   completer=get_storage_acl_name_completion_list(t_base_blob_service, 'container_name',
-                                                                  'get_access_policy'))
+                   completer=get_storage_acl_name_completion_list(t_blob_service, 'container_name',
+                                                                  'get_container_access_policy'))
         c.argument('permission', options_list='--permissions',
                    help=sas_help.format(get_permission_help_string(t_container_permissions)),
                    validator=get_permission_validator(t_container_permissions))
